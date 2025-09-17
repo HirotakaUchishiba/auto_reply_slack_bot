@@ -1,0 +1,2 @@
+# auto_reply_slack_bot
+PeatixやEventRegistからの問い合わせをSlack上で通知し、返信内容の生成と返信作業を自動化するBot。
