@@ -56,3 +56,38 @@ logs/
 # Temporary files
 *.tmp
 *.temp
+
+# AWS and Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars.backup
+.terraform.lock.hcl
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Environment variables
+.env.local
+.env.development
+.env.production
+
+# Lambda deployment packages
+*.zip
+deployment-package/
+
+# Secrets and sensitive files
+secrets/
+*.pem
+*.key
+*.crt
+
+# Local development
+local/
+temp/
