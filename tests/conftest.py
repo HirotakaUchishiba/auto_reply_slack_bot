@@ -68,7 +68,10 @@ def sample_slack_payload():
             "id": "C1234567890",
             "name": "test-channel"
         },
-        "response_url": "https://hooks.slack.com/actions/T1234567890/1234567890/abcdef1234567890",
+        "response_url": (
+            "https://hooks.slack.com/actions/T1234567890/1234567890/"
+            "abcdef1234567890"
+        ),
         "actions": [
             {
                 "action_id": "test_action",

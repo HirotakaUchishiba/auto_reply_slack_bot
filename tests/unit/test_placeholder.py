@@ -2,7 +2,6 @@
 Placeholder unit tests to ensure CI/CD pipeline runs successfully.
 These tests will be replaced with actual implementation tests in Phase 3.
 """
-import pytest
 
 
 def test_placeholder():
