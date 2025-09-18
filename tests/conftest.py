@@ -2,7 +2,7 @@
 Shared test fixtures and configuration for the Slack AI Assistant Bot test suite.
 """
 import pytest
-from moto import mock_dynamodb, mock_sqs, mock_secretsmanager
+from moto import mock_aws
 import boto3
 from unittest.mock import Mock
 
@@ -10,7 +10,7 @@ from unittest.mock import Mock
 @pytest.fixture
 def mock_dynamodb_client():
     """Mock DynamoDB client for unit tests."""
-    with mock_dynamodb():
+    with mock_aws():
         client = boto3.client('dynamodb', region_name='ap-northeast-1')
         yield client
 
@@ -18,7 +18,7 @@ def mock_dynamodb_client():
 @pytest.fixture
 def mock_sqs_client():
     """Mock SQS client for unit tests."""
-    with mock_sqs():
+    with mock_aws():
         client = boto3.client('sqs', region_name='ap-northeast-1')
         yield client
 
@@ -26,7 +26,7 @@ def mock_sqs_client():
 @pytest.fixture
 def mock_secrets_manager_client():
     """Mock Secrets Manager client for unit tests."""
-    with mock_secretsmanager():
+    with mock_aws():
         client = boto3.client('secretsmanager', region_name='ap-northeast-1')
         yield client
 
