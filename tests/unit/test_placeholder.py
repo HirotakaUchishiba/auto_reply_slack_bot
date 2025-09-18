@@ -35,7 +35,6 @@ def test_mock_functionality():
     """Test that mocking works correctly."""
     mock_obj = Mock()
     mock_obj.test_method.return_value = "mocked_result"
-    
     result = mock_obj.test_method()
     assert result == "mocked_result"
     mock_obj.test_method.assert_called_once()
@@ -46,7 +45,6 @@ def test_patch_functionality():
     """Test that patching works correctly."""
     # Test patching a module function
     import os
-    
     with patch('os.getcwd', return_value="/fake/path") as mock_getcwd:
         result = os.getcwd()
         assert result == "/fake/path"
@@ -72,7 +70,6 @@ def test_dynamodb_mock(mock_dynamodb_table):
             'data': 'test_data'
         }
     )
-    
     # Test that we can get the item
     response = mock_dynamodb_table.get_item(
         Key={
@@ -80,6 +77,5 @@ def test_dynamodb_mock(mock_dynamodb_table):
             'SK': 'PROFILE'
         }
     )
-    
     assert 'Item' in response
     assert response['Item']['data'] == 'test_data'
