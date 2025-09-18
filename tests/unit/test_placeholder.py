@@ -44,11 +44,13 @@ def test_mock_functionality():
 @pytest.mark.unit
 def test_patch_functionality():
     """Test that patching works correctly."""
-    with patch('builtins.len') as mock_len:
-        mock_len.return_value = 42
-        result = len("test")
-        assert result == 42
-        mock_len.assert_called_once_with("test")
+    # Test patching a module function
+    import os
+    
+    with patch('os.getcwd', return_value="/fake/path") as mock_getcwd:
+        result = os.getcwd()
+        assert result == "/fake/path"
+        mock_getcwd.assert_called_once()
 
 
 @pytest.mark.unit
