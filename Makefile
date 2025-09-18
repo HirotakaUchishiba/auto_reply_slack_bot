@@ -1,7 +1,7 @@
 # Slack AI Assistant Bot - Development Makefile
 # This Makefile provides standardized commands for common development tasks
 
-.PHONY: help install lint lint-fix test-unit test-integration test-e2e clean format check-all
+.PHONY: help install lint lint-fix test-unit test-integration test-e2e test-coverage clean format check-all
 
 # Default target
 help:
@@ -12,6 +12,7 @@ help:
 	@echo "  test-unit        - Run unit tests"
 	@echo "  test-integration - Run integration tests"
 	@echo "  test-e2e         - Run end-to-end tests"
+	@echo "  test-coverage    - Run tests with coverage report"
 	@echo "  format           - Format code with black"
 	@echo "  check-all        - Run all checks (lint + test-unit)"
 	@echo "  clean            - Clean up temporary files"
@@ -39,7 +40,9 @@ lint-fix:
 
 # Unit tests
 test-unit:
-	pytest tests/unit/ -v
+	@echo "Running unit tests..."
+	pytest tests/unit/ -v --cov=src --cov-report=term-missing
+	@echo "Unit tests completed successfully!"
 
 # Integration tests
 test-integration:
@@ -48,6 +51,12 @@ test-integration:
 # End-to-end tests
 test-e2e:
 	pytest tests/e2e/ -v
+
+# Test coverage
+test-coverage:
+	@echo "Running tests with coverage report..."
+	pytest tests/unit/ -v --cov=src --cov-report=html --cov-report=term-missing
+	@echo "Coverage report generated in htmlcov/index.html"
 
 # Code formatting
 format:

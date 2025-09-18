@@ -1,10 +1,18 @@
 """
 Shared test fixtures and configuration for the Slack AI Assistant Bot test suite.
 """
+import os
 import pytest
 from moto import mock_aws
 import boto3
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
+
+# Set test environment variables
+os.environ["AWS_DEFAULT_REGION"] = "ap-northeast-1"
+os.environ["AWS_ACCESS_KEY_ID"] = "testing"
+os.environ["AWS_SECRET_ACCESS_KEY"] = "testing"
+os.environ["AWS_SECURITY_TOKEN"] = "testing"
+os.environ["AWS_SESSION_TOKEN"] = "testing"
 
 
 @pytest.fixture
@@ -97,3 +105,56 @@ def sample_conversation_data():
             "thread_ts": "1234567890.123456"
         }
     }
+
+
+@pytest.fixture
+def mock_aws_environment():
+    """Mock AWS environment for testing."""
+    with patch.dict(os.environ, {
+        "AWS_DEFAULT_REGION": "ap-northeast-1",
+        "AWS_ACCESS_KEY_ID": "testing",
+        "AWS_SECRET_ACCESS_KEY": "testing",
+        "AWS_SECURITY_TOKEN": "testing",
+        "AWS_SESSION_TOKEN": "testing"
+    }):
+        yield
+
+
+@pytest.fixture
+def mock_dynamodb_table():
+    """Create a mock DynamoDB table for testing."""
+    with mock_aws():
+        dynamodb = boto3.resource('dynamodb', region_name='ap-northeast-1')
+        table = dynamodb.create_table(
+            TableName='SlackAiBotTable',
+            KeySchema=[
+                {'AttributeName': 'PK', 'KeyType': 'HASH'},
+                {'AttributeName': 'SK', 'KeyType': 'RANGE'}
+            ],
+            AttributeDefinitions=[
+                {'AttributeName': 'PK', 'AttributeType': 'S'},
+                {'AttributeName': 'SK', 'AttributeType': 'S'}
+            ],
+            BillingMode='PAY_PER_REQUEST'
+        )
+        yield table
+
+
+@pytest.fixture
+def mock_sqs_queue():
+    """Create a mock SQS queue for testing."""
+    with mock_aws():
+        sqs = boto3.client('sqs', region_name='ap-northeast-1')
+        queue = sqs.create_queue(QueueName='test-queue')
+        yield queue
+
+
+@pytest.fixture(autouse=True)
+def setup_test_environment():
+    """Automatically setup test environment for all tests."""
+    # This fixture runs automatically for all tests
+    with patch.dict(os.environ, {
+        "ENVIRONMENT": "test",
+        "LOG_LEVEL": "DEBUG"
+    }):
+        yield
