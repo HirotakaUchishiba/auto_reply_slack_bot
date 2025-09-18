@@ -85,6 +85,7 @@ module "lambda" {
   
   environment = local.environment
   project_name = "slack-ai-bot"
+  aws_region = var.aws_region
   
   # Dependencies
   lambda_execution_role_arn = module.iam.lambda_execution_role_arn
@@ -100,6 +101,7 @@ module "api_gateway" {
   
   environment = local.environment
   project_name = "slack-ai-bot"
+  aws_region = var.aws_region
   
   # Dependencies
   lambda_function_arn = module.lambda.function_arn
