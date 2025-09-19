@@ -1,9 +1,15 @@
 # IAM Module Main Configuration
 # This file defines the main resources for the IAM module
+# Implements least privilege principle with minimal required permissions
+
+# Local variables
+locals {
+  name_prefix = "${var.project_name}-${var.environment}"
+}
 
 # Lambda execution role
 resource "aws_iam_role" "lambda_execution_role" {
-  name = "${var.project_name}-${var.environment}-lambda-execution-role"
+  name = "${local.name_prefix}-lambda-execution-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -19,7 +25,7 @@ resource "aws_iam_role" "lambda_execution_role" {
   })
 
   tags = merge(var.tags, {
-    Name        = "${var.project_name}-${var.environment}-lambda-execution-role"
+    Name        = "${local.name_prefix}-lambda-execution-role"
     Environment = var.environment
     Project     = var.project_name
   })
@@ -31,9 +37,9 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-# Custom policy for DynamoDB access
+# Custom policy for DynamoDB access (least privilege)
 resource "aws_iam_role_policy" "lambda_dynamodb_policy" {
-  name = "${var.project_name}-${var.environment}-lambda-dynamodb-policy"
+  name = "${local.name_prefix}-lambda-dynamodb-policy"
   role = aws_iam_role.lambda_execution_role.id
 
   policy = jsonencode({
@@ -45,21 +51,19 @@ resource "aws_iam_role_policy" "lambda_dynamodb_policy" {
           "dynamodb:GetItem",
           "dynamodb:PutItem",
           "dynamodb:UpdateItem",
-          "dynamodb:DeleteItem",
-          "dynamodb:Query",
-          "dynamodb:Scan"
+          "dynamodb:Query"
         ]
         Resource = [
-          "arn:aws:dynamodb:*:*:table/${var.project_name}-${var.environment}-*"
+          "arn:aws:dynamodb:${var.aws_region}:*:table/${local.name_prefix}-conversations"
         ]
       }
     ]
   })
 }
 
-# Custom policy for SQS access
+# Custom policy for SQS access (least privilege)
 resource "aws_iam_role_policy" "lambda_sqs_policy" {
-  name = "${var.project_name}-${var.environment}-lambda-sqs-policy"
+  name = "${local.name_prefix}-lambda-sqs-policy"
   role = aws_iam_role.lambda_execution_role.id
 
   policy = jsonencode({
@@ -68,22 +72,19 @@ resource "aws_iam_role_policy" "lambda_sqs_policy" {
       {
         Effect = "Allow"
         Action = [
-          "sqs:SendMessage",
-          "sqs:ReceiveMessage",
-          "sqs:DeleteMessage",
-          "sqs:GetQueueAttributes"
+          "sqs:SendMessage"
         ]
         Resource = [
-          "arn:aws:sqs:*:*:${var.project_name}-${var.environment}-*"
+          "arn:aws:sqs:${var.aws_region}:*:${local.name_prefix}-dlq"
         ]
       }
     ]
   })
 }
 
-# Custom policy for Secrets Manager access
+# Custom policy for Secrets Manager access (least privilege)
 resource "aws_iam_role_policy" "lambda_secrets_manager_policy" {
-  name = "${var.project_name}-${var.environment}-lambda-secrets-manager-policy"
+  name = "${local.name_prefix}-lambda-secrets-manager-policy"
   role = aws_iam_role.lambda_execution_role.id
 
   policy = jsonencode({
@@ -95,7 +96,7 @@ resource "aws_iam_role_policy" "lambda_secrets_manager_policy" {
           "secretsmanager:GetSecretValue"
         ]
         Resource = [
-          "arn:aws:secretsmanager:*:*:secret:${var.project_name}-${var.environment}-*"
+          "arn:aws:secretsmanager:${var.aws_region}:*:secret:${local.name_prefix}-openai-api-key*"
         ]
       }
     ]
